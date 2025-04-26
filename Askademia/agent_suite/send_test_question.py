@@ -16,7 +16,7 @@ async def send_question(ctx: Context):
     try:
         await ctx.send(
             STUDENT_AGENT_ADDRESS,
-            Question(text="What is the meaning of life?", student_id="test_user_001")
+            Question(text="What is 2+2?", student_id="test_user_001")
         )
         ctx.logger.info("Question sent.")
     except Exception as e:

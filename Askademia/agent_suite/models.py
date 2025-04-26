@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 class Question(BaseModel):
     student_id: str
     text: str
+    image_url: str | None = None # Optional field for image URL
 
 class Answer(BaseModel):
     text: str

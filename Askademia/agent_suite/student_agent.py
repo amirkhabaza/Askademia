@@ -2,6 +2,7 @@ import asyncio
 # Use the new google-genai library
 from google import genai
 from google.genai import types
+import httpx # Added for fetching image URLs
 
 from uagents import Agent, Context, Model, Protocol
 from uagents.setup import fund_agent_if_low
@@ -22,10 +23,11 @@ student_agent = Agent(
 
 fund_agent_if_low(student_agent.wallet.address())
 
-async def analyze_question(question_text: str) -> dict:
-    """Analyzes question clarity and generates answer using Gemini."""
-    prompt = f"""Analyze the following student question. 
-    1. Is the question clear and answerable directly? (Answer YES or NO)
+# Pass ctx for logging within the function
+async def analyze_question(ctx: Context, question_text: str, image_url: str | None = None) -> dict:
+    """Analyzes question clarity (and image context if provided) and generates answer using Gemini."""
+    prompt = f"""Analyze the following student question, potentially referring to the provided image.
+    1. Is the question clear and answerable directly (considering the image if provided)? (Answer YES or NO)
     2. If YES, provide a concise answer.
     3. If NO, briefly explain why it's ambiguous.
 
@@ -36,13 +38,30 @@ async def analyze_question(question_text: str) -> dict:
     Answer/Reason: [Your answer or explanation]
     """
     try:
-        # Construct the request using the new types
-        contents = [types.Content(role="user", parts=[types.Part.from_text(text=prompt)])]
-        # Use the client to generate content (using the sync version for simplicity in async context)
+        parts = [types.Part.from_text(text=prompt)]
+
+        if image_url:
+            ctx.logger.info(f"Fetching image from URL: {image_url}") # Added logging for image fetch
+            try:
+                # Rename local variable to avoid shadowing global Gemini client
+                async with httpx.AsyncClient() as http_client:
+                    response = await http_client.get(image_url, timeout=10.0) # Added timeout
+                    response.raise_for_status() # Raise HTTP errors
+                    image_data = response.content
+                    mime_type = response.headers.get('content-type', 'image/jpeg') # Default mime type if not found
+                    parts.append(types.Part.from_data(data=image_data, mime_type=mime_type))
+            except httpx.RequestError as exc:
+                 ctx.logger.error(f"HTTP Exception for {exc.request.url} - {exc}")
+                 return {"clear": False, "detail": f"Error fetching image: {exc}"}
+            except Exception as img_exc: # Catch other potential errors during image processing
+                ctx.logger.error(f"Error processing image from {image_url}: {img_exc}")
+                return {"clear": False, "detail": f"Error processing image: {img_exc}"}
+
+        contents = [types.Content(role="user", parts=parts)]
+
         response = client.models.generate_content(model=gemini_model_name, contents=contents)
 
         # Basic parsing (improve with regex or more robust parsing if needed)
-        # Access text directly from the response object
         lines = response.text.strip().split('\n')
         clarity_line = next((line for line in lines if line.startswith('Clarity:')), "Clarity: NO")
         answer_reason_line = next((line for line in lines if line.startswith('Answer/Reason:')), "Answer/Reason: Could not process")
@@ -52,15 +71,21 @@ async def analyze_question(question_text: str) -> dict:
 
         return {"clear": is_clear, "detail": detail}
     except Exception as e:
+        # Log the specific error for better debugging
+        ctx.logger.error(f"Error during Gemini API call or parsing: {e}", exc_info=True)
         return {"clear": False, "detail": f"Error analyzing question: {e}"}
 
 student_proto = Protocol("StudentProtocol")
 
 @student_proto.on_message(model=Question)
 async def handle_question(ctx: Context, sender: str, msg: Question):
-    ctx.logger.info(f"Received question from {msg.student_id}: '{msg.text}'")
+    log_message = f"Received question from {msg.student_id}: '{msg.text}'"
+    if msg.image_url:
+        log_message += f" with image: {msg.image_url}"
+    ctx.logger.info(log_message)
 
-    analysis = await analyze_question(msg.text)
+    # Pass ctx, text and image_url to the analysis function
+    analysis = await analyze_question(ctx, msg.text, msg.image_url)
 
     if analysis["clear"]:
         answer_text = analysis["detail"]
@@ -76,7 +101,7 @@ async def handle_question(ctx: Context, sender: str, msg: Question):
             return
         await ctx.send(
             config.ESCALATION_AGENT_ADDRESS,
-            AmbiguousQuestion(original_question=msg.text, reason=reason)
+            AmbiguousQuestion(original_question=msg.text, reason=reason) # Consider adding image_url here too if needed
         )
 
 @student_proto.on_message(model=PerformanceData)
