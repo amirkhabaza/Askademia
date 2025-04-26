@@ -1,0 +1,5 @@
+uagents
+uagents-ai-engine
+pymongo
+requests
+python-dotenv
