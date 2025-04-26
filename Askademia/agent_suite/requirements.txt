@@ -1,0 +1,4 @@
+uagents
+google-genai
+python-dotenv
+pydantic

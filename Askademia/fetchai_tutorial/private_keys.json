@@ -1,0 +1,10 @@
+{
+    "My Second Agent": {
+        "identity_key": "6a5b454561ea6549a33f2823c0967e92e378a980d0d1dd26fe1ab3acbdbcef52",
+        "wallet_key": "SJD+hM5vPA61oIFCv8m5WihyA9qPSAr2MIzC+HAQbqQ="
+    },
+    "My First Agent": {
+        "identity_key": "63aaa601f2ccbfc4caa743d913821159a94cc688ea4a88f4b32aea26260629bc",
+        "wallet_key": "lF2Zi0nJivUhlvH3XNG89bEy2crBGXgAe8AiLJerdi0="
+    }
+}
