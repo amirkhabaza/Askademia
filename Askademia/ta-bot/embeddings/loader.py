@@ -1,40 +1,39 @@
-# embeddings/loader.py  ─────────────────────────────────────────
-import pathlib, fitz, tqdm, os, sys
-from embeddings.embedder        import embed
-from embeddings.chunk_utils     import sliding_chunks as chunks  # token-based
-from db.mongo_client            import get_db
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-COLLECTION = "syllabus_chunks"           # or course_chunks if you prefer
-DB  = get_db()[COLLECTION]               # ↳ atlas.collection
+import pathlib, fitz, tqdm, sys, glob
+from embeddings.embedder         import embed
+from embeddings.chunk_utils      import sliding_chunks as chunks
+from db.mongo_client             import get_db
+
+COLL = get_db()["syllabus_chunks"]          # or "syllabus_chunks"
+BATCH = 64                                # Mongo bulk-insert size
 
 def pdf_text(path: pathlib.Path) -> str:
-    """Extract plain text from a PDF file."""
-    doc = fitz.open(path)
-    return "".join(page.get_text("text") for page in doc)
+    """Return plain text from a PDF (PyMuPDF)."""
+    return "".join(p.get_text("text") for p in fitz.open(path))
 
-def ingest(pdf_path: str | pathlib.Path, course_id: str = "GEN"):
-    path  = pathlib.Path(pdf_path)
-    text  = pdf_text(path)
-    batch = []
+def ingest(pdf: str | pathlib.Path, course_id: str = "GEN"):
+    p    = pathlib.Path(pdf)
+    text = pdf_text(p)
+    buf  = []
 
-    for chunk in tqdm.tqdm(chunks(text, max_tokens=800, overlap=80)):
-        batch.append({
-            "course_id":  course_id,
-            "file":       path.name,
-            "chunk":      chunk,
-            "embedding":  embed(chunk)
-        })
-        if len(batch) == 64:                       # ← tune batch size
-            DB.insert_many(batch); batch.clear()
+    for c in tqdm.tqdm(chunks(text)):            # token-window splitter
+        buf.append({"course_id": course_id,
+                    "file":       p.name,
+                    "chunk":      c,
+                    "embedding":  embed(c)})
+        if len(buf) == BATCH:
+            COLL.insert_many(buf); buf.clear()
 
-    if batch:                                     # flush leftovers
-        DB.insert_many(batch)
+    if buf: COLL.insert_many(buf)                # flush leftovers
+    print(f"✅ {p.name}: {COLL.count_documents({'file': p.name})} chunks")
 
-    print(f"✅ {path.name}: now {DB.count_documents({'file': path.name})} chunks")
-
-# -----------------------------------------------------------------
+# ── CLI ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    # run:  python embeddings/loader.py syllabus.pdf DATA230
-    pdfs = sys.argv[1:-1] or ["syllabus.pdf"]
-    course = sys.argv[-1] if len(sys.argv) > 2 else "GEN"
-    for pdf in pdfs: ingest(pdf, course)
+    # Usage:  python embeddings/loader.py *.pdf COURSE_ID
+    pdfs      = sys.argv[1:-1] or glob.glob("*.pdf")
+    course_id = sys.argv[-1]   if len(sys.argv) > 2 else "GEN"
+    for pdf in pdfs:
+        ingest(pdf, course_id)
