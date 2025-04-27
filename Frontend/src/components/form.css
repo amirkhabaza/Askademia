@@ -1,0 +1,188 @@
+.chat-container {
+  width: 90vw; /* Use 90vw to give breathing room */
+  height: 90vh;
+  border: 2px solid #ccc;
+  border-radius: 25px;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+  padding: 10px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: background-color 0.3s, color 0.3s;
+  box-sizing: border-box; /* <<< IMPORTANT to prevent overflow */
+}
+
+/* Dark theme overrides */
+.chat-container.dark {
+  background-color: #2e2e2e;
+  color: #f9f9f9;
+}
+
+.messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.message {
+  margin-left: 20px;
+  margin-top: 20px;
+  padding: 12px;
+  border-radius: 20px;
+  max-width: 80%;
+}
+
+.message.user {
+  background-color: #f1f1f1;
+  align-self: flex-end;
+}
+
+/* Dark mode message for user */
+.chat-container.dark .message.user {
+  background-color: #444;
+}
+
+.message.bot {
+  background-color: #d1e6f0;
+  align-self: flex-start;
+}
+
+/* Dark mode message for bot */
+.chat-container.dark .message.bot {
+  background-color: #555;
+}
+
+.input-form {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+}
+
+.input-field {
+  width: 80%;
+  margin-left: 20px;
+  padding: 20px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  outline: none;
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+}
+
+.input-field:focus {
+  border-color: #007bff;
+}
+
+/* Dark mode input field */
+.chat-container.dark .input-field {
+  background-color: #444;
+  border-color: #555;
+  color: #f9f9f9;
+}
+
+.submit-btn {
+  display: none;
+}
+
+.upload-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+  padding: 8px;
+}
+
+.upload-btn i {
+  font-size: 20px;
+  color: #007bff;
+}
+
+.upload-btn:hover i {
+  color: #0056b3;
+}
+
+/* Button for toggling the theme */
+.theme-toggle-btn {
+  background-color: #4f4f4f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px; /* Match input-field roundedness */
+  cursor: pointer;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: background-color 0.3s, color 0.3s;
+  margin-bottom: 10px; /* Space between the buttons */
+}
+
+.theme-toggle-btn:hover {
+  background-color: #0e0e0e;
+}
+
+/* Clear button styles */
+.clear-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  width: 100%; /* Make the button take up 100% of the container's width */
+  box-sizing: border-box; /* Ensures padding doesn't affect the width */
+}
+
+.clear-btn:hover {
+  background-color: #ff1a1a;
+}
+
+/* Button for toggling the theme */
+.theme-toggle-btn {
+  background-color: #4f4f4f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: background-color 0.3s, color 0.3s;
+  width: 100%; /* Same width as clear button */
+}
+
+.theme-toggle-btn:hover {
+  background-color: #0e0e0e;
+}
+
+/* Wrapper for buttons (aligned to the right) */
+.buttons-container {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  justify-content: flex-end; /* Align the buttons to the bottom */
+  align-items: flex-end; /* Align buttons to the right */
+  position: absolute;
+  bottom: 20px; /* Same as the bottom position of the input field */
+  right: 20px; /* Align to the right */
+  width: 200px; /* Set a fixed width to ensure the buttons are consistent */
+}
+
+/* Logo container and logo styles */
+.logo-container {
+  position: absolute;
+  top: 20px; /* Adjust distance from the top */
+  right: 20px; /* Adjust distance from the right */
+}
+
+.logo {
+  width: 200px; /* Resize logo */
+  height: auto; /* Maintain aspect ratio */
+  border-radius: 25px;
+}
