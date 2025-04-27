@@ -14,11 +14,10 @@ from src.models import StudentQuery, TAResponse, ErrorResponse
 import config
 
 # --- Configuration (from config.py) ---
-TA_AGENT_ADDRESS = None # We will get this from the running agent instance later
+TA_AGENT_ADDRESS = None # Set via command-line argument
 
-# Query to send (keep allowing override here)
-QUERY_TEXT = "What is the policy on late submissions?"
-# QUERY_TEXT = "How is the final grade calculated?"
+# Default query if none is provided via command line
+DEFAULT_QUERY_TEXT = "What is the professor's name?"
 
 SENDER_NAME = config.STUDENT_AGENT_NAME
 SENDER_SEED = config.STUDENT_AGENT_SEED
@@ -54,23 +53,28 @@ async def handle_error_response(ctx: Context, sender: str, msg: ErrorResponse):
 # We'll add an argument parser for this.
 
 async def send_query_to_address(ctx: Context, target_address: str):
-    ctx.logger.info(f"Sending query to TA Agent {target_address}: '{QUERY_TEXT}'")
-    await ctx.send(target_address, StudentQuery(query=QUERY_TEXT))
+    ctx.logger.info(f"Sending query to TA Agent {target_address}: '{DEFAULT_QUERY_TEXT}'")
+    await ctx.send(target_address, StudentQuery(query=DEFAULT_QUERY_TEXT))
 
 # --- Main Execution with Argument Parsing ---
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Send a test query to the TA agent.")
     parser.add_argument("ta_address", type=str, help="The address of the running TA agent.")
+    parser.add_argument("--query", type=str, default=DEFAULT_QUERY_TEXT, 
+                        help=f"The query text to send (default: '{DEFAULT_QUERY_TEXT}')")
     args = parser.parse_args()
 
     TA_AGENT_ADDRESS = args.ta_address
+    query_to_send = args.query # Get the query from args
 
-    # Define the startup behavior *after* getting the address
+    # Define the startup behavior *after* getting the address and query
     @sender_agent.on_event("startup")
     async def startup_event(ctx: Context):
-        await send_query_to_address(ctx, TA_AGENT_ADDRESS)
+        ctx.logger.info(f"Sending query to TA Agent {TA_AGENT_ADDRESS}: '{query_to_send}'")
+        # Send the query from the arguments
+        await ctx.send(TA_AGENT_ADDRESS, StudentQuery(query=query_to_send))
 
     print(f"Running Test Sender Agent '{SENDER_NAME}'")
     print(f"Target TA Agent: {TA_AGENT_ADDRESS}")
-    print(f"Query: '{QUERY_TEXT}'")
+    print(f"Query: '{query_to_send}'") # Print the actual query being sent
     sender_agent.run() 

@@ -66,7 +66,7 @@ def retrieve_context(user_query: str) -> str:
 
 # Example Usage (optional, for testing)
 if __name__ == '__main__':
-    test_query = "What are the prerequisites for this course?"
+    test_query = "Summarize the main points of Lecture 3." 
     print(f"Retrieving context for query: '{test_query}'")
     context = retrieve_context(test_query)
     # Use newline character directly
