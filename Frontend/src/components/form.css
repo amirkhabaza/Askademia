@@ -1,5 +1,5 @@
 .chat-container {
-  width: 90vw; /* Use 90vw to give breathing room */
+  width: 90vw;
   height: 90vh;
   border: 2px solid #ccc;
   border-radius: 25px;
@@ -12,10 +12,9 @@
   left: 50%;
   transform: translate(-50%, -50%);
   transition: background-color 0.3s, color 0.3s;
-  box-sizing: border-box; /* <<< IMPORTANT to prevent overflow */
+  box-sizing: border-box;
 }
 
-/* Dark theme overrides */
 .chat-container.dark {
   background-color: #2e2e2e;
   color: #f9f9f9;
@@ -40,7 +39,6 @@
   align-self: flex-end;
 }
 
-/* Dark mode message for user */
 .chat-container.dark .message.user {
   background-color: #444;
 }
@@ -50,23 +48,21 @@
   align-self: flex-start;
 }
 
-/* Dark mode message for bot */
 .chat-container.dark .message.bot {
   background-color: #555;
 }
 
+/* Updated input form container to use flexbox for vertical stacking */
 .input-form {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   padding: 10px;
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
+  width: 85%;
 }
 
 .input-field {
-  width: 80%;
-  margin-left: 20px;
+  width: 100%;
+  margin-bottom: 10px; /* Space between textboxes */
   padding: 20px;
   border-radius: 25px;
   border: 1px solid #ccc;
@@ -80,7 +76,6 @@
   border-color: #007bff;
 }
 
-/* Dark mode input field */
 .chat-container.dark .input-field {
   background-color: #444;
   border-color: #555;
@@ -108,25 +103,23 @@
   color: #0056b3;
 }
 
-/* Button for toggling the theme */
 .theme-toggle-btn {
   background-color: #4f4f4f;
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 25px; /* Match input-field roundedness */
+  border-radius: 25px;
   cursor: pointer;
   font-size: 16px;
   box-sizing: border-box;
   transition: background-color 0.3s, color 0.3s;
-  margin-bottom: 10px; /* Space between the buttons */
+  margin-bottom: 10px;
 }
 
 .theme-toggle-btn:hover {
   background-color: #0e0e0e;
 }
 
-/* Clear button styles */
 .clear-btn {
   background-color: #ff4d4d;
   color: white;
@@ -136,15 +129,14 @@
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s;
-  width: 100%; /* Make the button take up 100% of the container's width */
-  box-sizing: border-box; /* Ensures padding doesn't affect the width */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .clear-btn:hover {
   background-color: #ff1a1a;
 }
 
-/* Button for toggling the theme */
 .theme-toggle-btn {
   background-color: #4f4f4f;
   color: white;
@@ -155,34 +147,33 @@
   font-size: 16px;
   box-sizing: border-box;
   transition: background-color 0.3s, color 0.3s;
-  width: 100%; /* Same width as clear button */
+  width: 100%;
 }
 
 .theme-toggle-btn:hover {
   background-color: #0e0e0e;
 }
 
-/* Wrapper for buttons (aligned to the right) */
+/* Wrapper for buttons */
 .buttons-container {
   display: flex;
-  flex-direction: column; /* Stack buttons vertically */
-  justify-content: flex-end; /* Align the buttons to the bottom */
-  align-items: flex-end; /* Align buttons to the right */
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
   position: absolute;
-  bottom: 20px; /* Same as the bottom position of the input field */
-  right: 20px; /* Align to the right */
-  width: 200px; /* Set a fixed width to ensure the buttons are consistent */
+  bottom: 20px;
+  right: 20px;
+  width: 200px;
 }
 
-/* Logo container and logo styles */
 .logo-container {
   position: absolute;
-  top: 20px; /* Adjust distance from the top */
-  right: 20px; /* Adjust distance from the right */
+  top: 20px;
+  right: 20px;
 }
 
 .logo {
-  width: 200px; /* Resize logo */
-  height: auto; /* Maintain aspect ratio */
+  width: 200px;
+  height: auto;
   border-radius: 25px;
 }
