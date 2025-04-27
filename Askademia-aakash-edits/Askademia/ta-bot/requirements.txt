@@ -1,0 +1,8 @@
+uagents
+google-genai
+python-dotenv
+pydantic
+httpx
+pymupdf 
+tiktoken 
+tqdm
