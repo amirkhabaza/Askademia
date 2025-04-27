@@ -23,3 +23,11 @@ STUDENT_AGENT_NAME = "test_student_agent"
 STUDENT_AGENT_SEED = os.getenv("STUDENT_AGENT_SEED", "test_student_default_dev_seed")
 STUDENT_AGENT_PORT = 8002 # Default port for the student agent if it needs one
 STUDENT_AGENT_ENDPOINT = f"http://localhost:{STUDENT_AGENT_PORT}/submit"
+
+CANVAS_BASE_URL = os.getenv("CANVAS_BASE_URL")
+CANVAS_API_TOKEN = os.getenv("CANVAS_API_TOKEN")
+
+CANVAS_COURSE_IDS = {
+    "SP25: DATA-201 Sec 22 - Database Tech for DA": "1606393", # Replace with your actual Course Name: Course ID mapping
+    # "ANOTHER_COURSE": "987654" 
+} 

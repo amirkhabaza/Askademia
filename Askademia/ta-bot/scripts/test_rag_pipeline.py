@@ -11,7 +11,7 @@ from prompts.ta_system_prompts import TA_SYSTEM_PROMPT
 def main():
     # --- Simulate User Input ---
     # Try different queries relevant to your Syllabus.pdf
-    user_query = "Summarize the main points of Lecture 3."
+    user_query = "What is the professor's email address?"
     # user_query = "What topics are covered in week 3?"
     # user_query = "What is the professor's email address?"
 
